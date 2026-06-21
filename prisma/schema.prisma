@@ -1,0 +1,28 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Question {
+  id                  String   @id @default(cuid())
+  userId              String
+  title               String
+  url                 String   @default("")
+  summary             String   @default("")
+  solution            String   @default("")
+  topics              String[]
+  status              String   @default("Red")
+  lastRevisedTimestamp DateTime @default(now())
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, status])
+}
