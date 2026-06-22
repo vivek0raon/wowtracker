@@ -6,6 +6,9 @@ import { updateQuestionStatus } from '@/lib/actions';
 import type { QuestionWithActiveStatus } from '@/lib/actions';
 import StatusBadge from '@/components/StatusBadge';
 import { TopicsCell } from '@/components/QuestionTable';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 
 interface QuizCardProps {
   question: QuestionWithActiveStatus;
@@ -53,7 +56,11 @@ export default function QuizCard({ question }: QuizCardProps) {
       </h2>
 
       {question.summary && (
-        <p className="quiz-summary">{question.summary}</p>
+        <div className="quiz-summary" style={{ fontSize: '0.95rem' }}>
+          <div className="prose prose-sm prose-invert max-w-none">
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{question.summary}</ReactMarkdown>
+          </div>
+        </div>
       )}
 
       {question.topics.length > 0 && (
@@ -83,7 +90,11 @@ export default function QuizCard({ question }: QuizCardProps) {
       ) : (
         <div className="quiz-solution-wrapper">
           {question.solution ? (
-            <div className="quiz-solution">{question.solution}</div>
+            <div className="quiz-solution" style={{ fontSize: '0.95rem' }}>
+              <div className="prose prose-sm prose-invert max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{question.solution}</ReactMarkdown>
+              </div>
+            </div>
           ) : (
             <div
               className="quiz-solution"

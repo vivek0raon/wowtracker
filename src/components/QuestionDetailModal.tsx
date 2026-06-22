@@ -7,6 +7,9 @@ import StatusBadge from '@/components/StatusBadge';
 import StatusButtons from '@/components/StatusButtons';
 import Modal from '@/components/Modal';
 import { SpoilerCell, TopicsCell } from '@/components/QuestionTable';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 
 interface QuestionDetailModalProps {
   question: QuestionWithActiveStatus;
@@ -85,7 +88,11 @@ export default function QuestionDetailModal({
       {question.summary && (
         <div className="detail-section">
           <div className="detail-label">Summary</div>
-          <div className="detail-text">{question.summary}</div>
+          <div className="detail-text" style={{ fontSize: '0.95rem' }}>
+            <div className="prose prose-sm prose-invert max-w-none">
+              <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{question.summary}</ReactMarkdown>
+            </div>
+          </div>
         </div>
       )}
 

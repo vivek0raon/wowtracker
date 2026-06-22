@@ -5,6 +5,9 @@ import type { QuestionWithActiveStatus } from '@/lib/actions';
 import StatusBadge from '@/components/StatusBadge';
 import StatusButtons from '@/components/StatusButtons';
 import QuestionDetailModal from '@/components/QuestionDetailModal';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 
 interface QuestionTableProps {
   questions: QuestionWithActiveStatus[];
@@ -40,7 +43,7 @@ function getRowClass(status: string) {
   }
 }
 
-export function SpoilerCell({ content, blurText = "Click to reveal" }: { content: string, blurText?: string }) {
+export function SpoilerCell({ content, blurText = "Click to reveal", maxHeight = 250 }: { content: string, blurText?: string, maxHeight?: number }) {
   const [revealed, setRevealed] = useState(false);
 
   if (!content) return <span style={{ color: 'var(--text-tertiary)' }}>—</span>;
@@ -53,8 +56,15 @@ export function SpoilerCell({ content, blurText = "Click to reveal" }: { content
         setRevealed(true);
       }}
     >
-      <div className={`blur-reveal-content ${revealed ? 'revealed' : ''}`}>
-        <div className="spoiler-text">{content}</div>
+      <div 
+        className={`blur-reveal-content ${revealed ? 'revealed' : ''}`}
+        style={maxHeight ? { maxHeight: `${maxHeight}px`, overflowY: revealed ? 'auto' : 'hidden' } : undefined}
+      >
+        <div className="spoiler-text" style={{ cursor: revealed ? 'auto' : 'pointer' }} onClick={(e) => revealed && e.stopPropagation()}>
+          <div className="prose prose-sm prose-invert max-w-none">
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{content}</ReactMarkdown>
+          </div>
+        </div>
       </div>
       <div className={`blur-reveal-overlay ${revealed ? 'revealed' : ''}`}>
         {blurText}

@@ -1,9 +1,9 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* ===========================
    THEME VARIABLES
    =========================== */
-
 :root,
 [data-theme="light"] {
   --bg-primary: #f0f2f5;
@@ -326,7 +326,7 @@ body {
 }
 
 .add-form-container.open {
-  max-height: 700px;
+  max-height: 2000px;
   opacity: 1;
   margin-top: 0.75rem;
 }
