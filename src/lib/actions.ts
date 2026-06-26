@@ -13,6 +13,7 @@ export async function addQuestion(formData: FormData) {
   const url = (formData.get('url') as string) || '';
   const summary = (formData.get('summary') as string) || '';
   const solution = (formData.get('solution') as string) || '';
+  const code = (formData.get('code') as string) || '';
   const topicsRaw = (formData.get('topics') as string) || '';
   const topics = topicsRaw
     .split(',')
@@ -30,6 +31,7 @@ export async function addQuestion(formData: FormData) {
       url: url.trim(),
       summary: summary.trim(),
       solution: solution.trim(),
+      code: code.trim(),
       topics,
       status: 'Red',
       lastRevisedTimestamp: new Date(),
@@ -93,6 +95,7 @@ export type QuestionWithActiveStatus = {
   url: string;
   summary: string;
   solution: string;
+  code: string;
   topics: string[];
   status: string;
   activeStatus: StatusColor;

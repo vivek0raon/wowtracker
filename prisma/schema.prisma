@@ -17,6 +17,7 @@ model Question {
   url                 String   @default("")
   summary             String   @default("")
   solution            String   @default("")
+  code                String   @default("")
   topics              String[]
   status              String   @default("Red")
   lastRevisedTimestamp DateTime @default(now())

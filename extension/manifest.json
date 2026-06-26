@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "DSA Auto-Sync",
+  "version": "1.0",
+  "description": "Automatically extract LeetCode/GFG problems and sync to your DSA Tracker with AI summaries.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://leetcode.com/problems/*",
+    "https://www.geeksforgeeks.org/problems/*",
+    "http://localhost:3000/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "DSA Auto-Sync"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://leetcode.com/problems/*",
+        "https://www.geeksforgeeks.org/problems/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

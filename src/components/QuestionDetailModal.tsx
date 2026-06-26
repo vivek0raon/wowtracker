@@ -110,6 +110,13 @@ export default function QuestionDetailModal({
         </div>
       )}
 
+      {question.code && (
+        <div className="detail-section">
+          <div className="detail-label">Submitted Code</div>
+          <SpoilerCell content={`\`\`\`\n${question.code}\n\`\`\``} blurText="Reveal code" />
+        </div>
+      )}
+
       <div className="detail-actions">
         <div className="detail-label">Update Status</div>
         <StatusButtons questionId={question.id} />

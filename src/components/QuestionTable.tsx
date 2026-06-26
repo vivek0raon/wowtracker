@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import type { QuestionWithActiveStatus } from '@/lib/actions';
 import StatusBadge from '@/components/StatusBadge';
-import StatusButtons from '@/components/StatusButtons';
 import QuestionDetailModal from '@/components/QuestionDetailModal';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -104,7 +103,7 @@ export function TopicsCell({ topics }: { topics: string[] }) {
   );
 }
 
-// Desktop Table
+// Desktop Table — Compact Notion database view
 function DesktopTable({ 
   questions, 
   onSelectQuestion 
@@ -113,17 +112,16 @@ function DesktopTable({
   onSelectQuestion: (q: QuestionWithActiveStatus) => void 
 }) {
   return (
-    <div className="table-wrapper glass-card-static">
+    <div className="table-wrapper">
       <table className="data-table">
         <thead>
           <tr>
-            <th style={{ width: '40px' }}>#</th>
-            <th>Title</th>
-            <th style={{ width: '110px' }}>Status</th>
-            <th style={{ width: '140px' }}>Topics</th>
-            <th>Solution</th>
-            <th style={{ width: '90px' }}>Revised</th>
-            <th style={{ width: '150px' }}>Update</th>
+            <th style={{ width: '36px' }}>#</th>
+            <th>Problem Name</th>
+            <th style={{ width: '80px' }}>Status</th>
+            <th style={{ width: '180px' }}>Topic</th>
+            <th>Approach Summary</th>
+            <th style={{ width: '100px' }}>Revised</th>
           </tr>
         </thead>
         <tbody>
@@ -133,54 +131,47 @@ function DesktopTable({
               className={`${getRowClass(q.activeStatus)} clickable-row`}
               onClick={() => onSelectQuestion(q)}
             >
-              <td style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem' }}>
-                {i + 1}
+              <td className="cell-muted">{i + 1}</td>
+              <td>
+                <div className="cell-title">
+                  {q.url ? (
+                    <a
+                      href={q.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="table-title-link"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {q.title} ↗
+                    </a>
+                  ) : (
+                    <span className="table-title-link">{q.title}</span>
+                  )}
+                </div>
               </td>
               <td>
-                {q.url ? (
-                  <a
-                    href={q.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="table-title-link"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {q.title} ↗
-                  </a>
-                ) : (
-                  <span className="table-title-link">{q.title}</span>
-                )}
-                {q.summary && (
-                  <div
-                    style={{
-                      fontSize: '0.775rem',
-                      color: 'var(--text-tertiary)',
-                      marginTop: '0.15rem',
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    {q.summary.length > 80
-                      ? q.summary.substring(0, 80) + '...'
-                      : q.summary}
-                  </div>
-                )}
+                <StatusBadge status={q.activeStatus} size="sm" />
               </td>
               <td>
-                <StatusBadge status={q.activeStatus} size="md" />
+                <div className="cell-tags">
+                  {q.topics.length > 0 ? (
+                    q.topics.map((t) => (
+                      <span key={t} className="topic-tag">{t}</span>
+                    ))
+                  ) : (
+                    <span className="cell-muted">—</span>
+                  )}
+                </div>
               </td>
-              <td onClick={(e) => e.stopPropagation()}>
-                <TopicsCell topics={q.topics} />
-              </td>
-              <td onClick={(e) => e.stopPropagation()}>
-                <SpoilerCell content={q.solution} blurText="Reveal solution" />
+              <td>
+                <div className="cell-summary">
+                  {q.summary || <span className="cell-muted">—</span>}
+                </div>
               </td>
               <td>
                 <span className="table-date">
                   {formatDateFull(q.lastRevisedTimestamp)}
                 </span>
-              </td>
-              <td onClick={(e) => e.stopPropagation()}>
-                <StatusButtons questionId={q.id} />
               </td>
             </tr>
           ))}
@@ -199,24 +190,27 @@ function MobileCards({
   onSelectQuestion: (q: QuestionWithActiveStatus) => void 
 }) {
   return (
-    <div className="mobile-cards">
-      {questions.map((q) => (
-        <div
-          key={q.id}
-          className={`mobile-card glass-card ${getRowClass(q.activeStatus)}`}
-          onClick={() => onSelectQuestion(q)}
-        >
-          <div className="mobile-card-header">
-            <span className="mobile-card-title">{q.title}</span>
-            <StatusBadge status={q.activeStatus} size="sm" />
+    <div className="mobile-cards-container">
+      <div className="mobile-cards-header">
+        <span>Problem Name</span>
+        <span>Revised</span>
+      </div>
+      <div className="mobile-cards">
+        {questions.map((q) => (
+          <div
+            key={q.id}
+            className={`mobile-card ${getRowClass(q.activeStatus)}`}
+            onClick={() => onSelectQuestion(q)}
+          >
+            <div className="mobile-card-inner">
+              <span className="mobile-card-title">{q.title}</span>
+              <span className="mobile-card-date">
+                {formatDate(q.lastRevisedTimestamp)}
+              </span>
+            </div>
           </div>
-          <div className="mobile-card-meta">
-            <span className="mobile-card-date">
-              {formatDate(q.lastRevisedTimestamp)}
-            </span>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

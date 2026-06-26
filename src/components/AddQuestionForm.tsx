@@ -26,6 +26,7 @@ export default function AddQuestionForm() {
   const [isPending, startTransition] = useTransition();
   const [summary, setSummary] = useState<string>('');
   const [solution, setSolution] = useState<string>('');
+  const [code, setCode] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,12 +36,14 @@ export default function AddQuestionForm() {
     // Inject the markdown state into formData
     formData.set('summary', summary || '');
     formData.set('solution', solution || '');
+    formData.set('code', code || '');
 
     startTransition(async () => {
       await addQuestion(formData);
       form.reset();
       setSummary('');
       setSolution('');
+      setCode('');
       setIsOpen(false);
     });
   };
@@ -163,6 +166,21 @@ export default function AddQuestionForm() {
                 }}
               />
             </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="code">
+              Submitted Code
+            </label>
+            <textarea
+              id="code"
+              name="code"
+              className="form-input"
+              style={{ fontFamily: 'monospace', minHeight: '150px', resize: 'vertical' }}
+              placeholder="Paste your raw code here..."
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
           </div>
 
           <div className="form-group">
