@@ -41,23 +41,36 @@ export async function POST(request: Request) {
         Return the response strictly as a JSON object with exactly two keys: "questionSummary" and "solutionSummary". Do not output markdown code blocks.
       `;
 
-      try {
-        const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: prompt,
-        });
-        
-        const text = response.text || '';
-        // Clean markdown blocks if the AI accidentally adds them
-        const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        const parsed = JSON.parse(cleanedText);
-        
-        questionSummary = parsed.questionSummary || '';
-        solutionSummary = parsed.solutionSummary || '';
-      } catch (aiError) {
-        console.error('AI Generation Error:', aiError);
+      let retries = 3;
+      let aiSuccess = false;
+      
+      while (retries > 0 && !aiSuccess) {
+        try {
+          const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+          });
+          
+          const text = response.text || '';
+          // Clean markdown blocks if the AI accidentally adds them
+          const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          const parsed = JSON.parse(cleanedText);
+          
+          questionSummary = parsed.questionSummary || '';
+          solutionSummary = parsed.solutionSummary || '';
+          aiSuccess = true;
+        } catch (aiError: any) {
+          console.error(`AI Generation Error (Retries left: ${retries - 1}):`, aiError.message || aiError);
+          retries--;
+          if (retries > 0) {
+            // Wait 2 seconds before retrying
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          } else {
+            questionSummary = "AI summary unavailable due to high server demand. Please edit to add your own summary.";
+            solutionSummary = "AI solution summary unavailable due to high server demand.";
+          }
+        }
       }
-    }
 
     // Clean up topics (tags)
     const topics = Array.isArray(tags) 
