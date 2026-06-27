@@ -71,6 +71,7 @@ export async function POST(request: Request) {
           }
         }
       }
+    }
 
     // Clean up topics (tags)
     const topics = Array.isArray(tags) 
