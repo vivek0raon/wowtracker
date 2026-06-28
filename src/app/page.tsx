@@ -1,6 +1,7 @@
 import { getQuestions } from '@/lib/actions';
 import AddQuestionForm from '@/components/AddQuestionForm';
 import QuestionTable from '@/components/QuestionTable';
+import DailyGoalWidget from '@/components/DailyGoalWidget';
 
 export default async function DashboardPage() {
   const questions = await getQuestions();
@@ -38,6 +39,9 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Daily Goal Focus Mode Widget */}
+      <DailyGoalWidget />
 
       <AddQuestionForm />
       <QuestionTable questions={questions} />

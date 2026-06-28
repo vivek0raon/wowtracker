@@ -27,11 +27,8 @@ export default function Header() {
             <span className="header-logo-text">DSA Tracker</span>
           </Link>
           <nav className="header-nav">
-            <Link href="/" className="header-nav-link">
-              Dashboard
-            </Link>
             <Link href="/quiz" className="header-nav-link">
-              Quiz
+              Daily Goal
             </Link>
           </nav>
         </div>

@@ -217,6 +217,7 @@ function MobileCards({
 
 export default function QuestionTable({ questions }: QuestionTableProps) {
   const [filter, setFilter] = useState<string>('All');
+  const [topicFilter, setTopicFilter] = useState<string>('All Topics');
   const [selectedQuestion, setSelectedQuestion] = useState<QuestionWithActiveStatus | null>(null);
 
   if (questions.length === 0) {
@@ -231,9 +232,14 @@ export default function QuestionTable({ questions }: QuestionTableProps) {
     );
   }
 
+  // Extract unique topics
+  const allTopics = Array.from(new Set(questions.flatMap(q => q.topics))).sort();
+  const topicOptions = ['All Topics', ...allTopics];
+
   const filteredQuestions = questions.filter((q) => {
-    if (filter === 'All') return true;
-    return q.activeStatus === filter;
+    if (filter !== 'All' && q.activeStatus !== filter) return false;
+    if (topicFilter !== 'All Topics' && !q.topics.includes(topicFilter)) return false;
+    return true;
   });
 
   const filters = [
@@ -246,16 +252,41 @@ export default function QuestionTable({ questions }: QuestionTableProps) {
 
   return (
     <>
-      <div className="filter-bar">
-        {filters.map((f) => (
-          <button
-            key={f.id}
-            onClick={() => setFilter(f.id)}
-            className={`filter-btn ${filter === f.id ? 'active' : ''}`}
+      <div className="filter-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {filters.map((f) => (
+            <button
+              key={f.id}
+              className={`filter-btn ${filter === f.id ? 'active' : ''}`}
+              onClick={() => setFilter(f.id)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        
+        {/* Topic Filter Dropdown */}
+        {allTopics.length > 0 && (
+          <select 
+            value={topicFilter}
+            onChange={(e) => setTopicFilter(e.target.value)}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '99px',
+              border: '1px solid var(--border-color)',
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-primary)',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+              outline: 'none'
+            }}
           >
-            {f.label}
-          </button>
-        ))}
+            {topicOptions.map(topic => (
+              <option key={topic} value={topic}>{topic}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       {filteredQuestions.length === 0 ? (

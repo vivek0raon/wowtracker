@@ -57,7 +57,7 @@ function extractLeetCode() {
 }
 
 // Extract data from GeeksForGeeks
-async function extractGFG() {
+function extractGFG() {
   // Title
   let title = '';
   const titleEl = document.querySelector('.problem-statement h3') || document.querySelector('.g-m-0');

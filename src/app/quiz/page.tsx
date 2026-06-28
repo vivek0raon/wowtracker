@@ -1,13 +1,13 @@
 import Link from 'next/link';
-import { getQuizQuestion } from '@/lib/actions';
-import QuizCard from '@/components/QuizCard';
+import { getQuestions } from '@/lib/actions';
+import FocusMode from '@/components/FocusMode';
 
 export const dynamic = 'force-dynamic';
 
 export default async function QuizPage() {
-  const question = await getQuizQuestion();
+  const questions = await getQuestions();
 
-  if (!question) {
+  if (!questions || questions.length === 0) {
     return (
       <div className="quiz-container">
         <div className="glass-card" style={{ padding: '3rem 2rem', textAlign: 'center', maxWidth: '480px' }}>
@@ -26,7 +26,7 @@ export default async function QuizPage() {
 
   return (
     <div className="quiz-container">
-      <QuizCard question={question} />
+      <FocusMode questions={questions} />
     </div>
   );
 }
