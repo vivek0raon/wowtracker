@@ -116,7 +116,6 @@ export default function ActivityHeatmap({ logs }: ActivityHeatmapProps) {
           data={data} 
           theme={customTheme}
           colorScheme={theme}
-          hideTotalCount={true}
           labels={{
             totalCount: '{{count}} revisions in the past year',
           }}
