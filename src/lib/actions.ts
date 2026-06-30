@@ -57,7 +57,7 @@ export async function updateQuestionStatus(
     throw new Error('Question not found or unauthorized');
   }
 
-  await prisma.question.update({
+  const updated = await prisma.question.update({
     where: { id: questionId },
     data: {
       status: newStatus,
@@ -65,8 +65,17 @@ export async function updateQuestionStatus(
     },
   });
 
+  // Log this revision for the heatmap
+  await prisma.revisionLog.create({
+    data: {
+      userId,
+      questionId,
+    },
+  });
+
   revalidatePath('/');
   revalidatePath('/quiz');
+  return updated;
 }
 
 export async function deleteQuestion(questionId: string) {
@@ -155,4 +164,24 @@ export async function getQuizQuestion(): Promise<QuestionWithActiveStatus | null
   const last = withStatus[withStatus.length - 1];
   const { weight, ...rest } = last;
   return rest;
+}
+
+export async function getRevisionLogs() {
+  const { userId } = await auth();
+  if (!userId) return [];
+
+  // Get logs for the past 365 days
+  const oneYearAgo = new Date();
+  oneYearAgo.setDate(oneYearAgo.getDate() - 365);
+
+  const logs = await prisma.revisionLog.findMany({
+    where: {
+      userId,
+      timestamp: { gte: oneYearAgo },
+    },
+    select: { timestamp: true },
+    orderBy: { timestamp: 'asc' },
+  });
+
+  return logs.map(l => l.timestamp);
 }
