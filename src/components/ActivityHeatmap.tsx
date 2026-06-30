@@ -119,7 +119,7 @@ export default function ActivityHeatmap({ logs }: ActivityHeatmapProps) {
           labels={{
             totalCount: '{{count}} revisions in the past year',
           }}
-          renderBlock={(block, activity) => React.cloneElement(block as React.ReactElement, {
+          renderBlock={(block, activity) => React.cloneElement(block as React.ReactElement<any>, {
             'data-tooltip-id': 'react-tooltip',
             'data-tooltip-content': `${activity.count} revisions on ${format(new Date(activity.date), 'MMM d, yyyy')}`,
           })}
