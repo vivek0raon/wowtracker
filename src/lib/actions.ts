@@ -97,6 +97,38 @@ export async function deleteQuestion(questionId: string) {
   revalidatePath('/');
 }
 
+export async function updateQuestionDetails(
+  questionId: string,
+  data: {
+    title?: string;
+    url?: string;
+    summary?: string;
+    code?: string;
+    topics?: string[];
+    solution?: string;
+  }
+) {
+  const { userId } = await auth();
+  if (!userId) throw new Error('Unauthorized');
+
+  const question = await prisma.question.findUnique({
+    where: { id: questionId },
+  });
+
+  if (!question || question.userId !== userId) {
+    throw new Error('Question not found or unauthorized');
+  }
+
+  const updated = await prisma.question.update({
+    where: { id: questionId },
+    data,
+  });
+
+  revalidatePath('/');
+  revalidatePath('/quiz');
+  return updated;
+}
+
 export type QuestionWithActiveStatus = {
   id: string;
   userId: string;
