@@ -86,6 +86,67 @@ export default function QuestionDetailModal({
 
   const createPasteHandler = (setter: React.Dispatch<React.SetStateAction<string>>) => {
     return (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+      const items = e.clipboardData?.items;
+      if (items) {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            e.preventDefault();
+            const file = items[i].getAsFile();
+            if (!file) continue;
+            
+            const target = e.currentTarget;
+            const start = target.selectionStart;
+            const end = target.selectionEnd;
+            const value = target.value;
+            
+            setter(value.substring(0, start) + '*(Uploading image...)*' + value.substring(end));
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              const img = new window.Image();
+              img.onload = async () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1000;
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > MAX_WIDTH) {
+                  height = Math.round((height * MAX_WIDTH) / width);
+                  width = MAX_WIDTH;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                  ctx.drawImage(img, 0, 0, width, height);
+                  const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                  
+                  try {
+                    const res = await fetch('/api/upload', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ data: compressedBase64 })
+                    });
+                    const data = await res.json();
+                    if (data.url) {
+                      setter(prev => prev.replace('*(Uploading image...)*', `![image](${data.url})`));
+                    } else {
+                      setter(prev => prev.replace('*(Uploading image...)*', '*(Image upload failed)*'));
+                    }
+                  } catch (err) {
+                    setter(prev => prev.replace('*(Uploading image...)*', '*(Image upload failed)*'));
+                  }
+                }
+              };
+              img.src = event.target?.result as string;
+            };
+            reader.readAsDataURL(file);
+            return;
+          }
+        }
+      }
+
       const html = e.clipboardData.getData('text/html');
       if (html && turndownService) {
         e.preventDefault();

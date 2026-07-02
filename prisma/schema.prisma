@@ -37,3 +37,9 @@ model RevisionLog {
   @@index([userId])
   @@index([timestamp])
 }
+
+model Image {
+  id        String   @id @default(cuid())
+  data      String
+  createdAt DateTime @default(now())
+}
