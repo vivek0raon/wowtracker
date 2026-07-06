@@ -156,7 +156,7 @@ export default function FocusMode({ questions }: FocusModeProps) {
       <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-secondary)', padding: '0.5rem 1.5rem', borderRadius: '99px', border: '1px solid var(--border-color)' }}>
         <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Today's Progress</span>
         <div style={{ width: '100px', height: '6px', background: 'var(--bg-tertiary)', borderRadius: '3px', overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${Math.min((progress / goal) * 100, 100)}%`, background: progress >= goal ? 'var(--status-green)' : 'var(--accent-primary)', transition: 'width 0.3s' }}></div>
+          <div style={{ height: '100%', width: `${Math.min((progress / goal) * 100, 100)}%`, background: progress >= goal ? 'var(--status-green)' : 'var(--accent)', transition: 'width 0.3s' }}></div>
         </div>
         <span style={{ fontSize: '0.875rem', fontWeight: 600, color: progress >= goal ? 'var(--status-green)' : 'var(--text-primary)' }}>{progress} / {goal}</span>
       </div>

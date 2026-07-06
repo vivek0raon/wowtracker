@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import ReminderButton from './ReminderButton';
 
 export default function DailyGoalWidget() {
   const [goal, setGoal] = useState(5);
@@ -96,22 +97,26 @@ export default function DailyGoalWidget() {
         </div>
       </div>
       
-      <Link 
-        href="/quiz" 
-        style={{ 
-          background: percentage >= 100 ? 'var(--status-green-solid)' : 'var(--accent)', 
-          color: 'white', 
-          padding: '0.75rem 1.5rem', 
-          borderRadius: '99px', 
-          fontWeight: 600,
-          textDecoration: 'none',
-          display: 'inline-block',
-          boxShadow: percentage >= 100 ? '0 4px 14px rgba(0, 184, 163, 0.3)' : '0 4px 14px rgba(66, 153, 225, 0.3)',
-          transition: 'all 0.2s ease'
-        }}
-      >
-        {percentage >= 100 ? 'Keep Going 🔥' : 'Start Focus Mode'}
-      </Link>
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <ReminderButton />
+        <Link 
+          href="/quiz" 
+          style={{ 
+            background: percentage >= 100 ? 'var(--status-green-solid)' : 'var(--accent)', 
+            color: 'white', 
+            padding: '0.75rem 1.25rem', 
+            borderRadius: '99px', 
+            fontWeight: 600,
+            whiteSpace: 'nowrap',
+            textDecoration: 'none',
+            display: 'inline-block',
+            boxShadow: percentage >= 100 ? '0 4px 14px rgba(0, 184, 163, 0.3)' : '0 4px 14px rgba(66, 153, 225, 0.3)',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          {percentage >= 100 ? 'Keep Going 🔥' : 'Start Focus Mode'}
+        </Link>
+      </div>
     </div>
   );
 }
