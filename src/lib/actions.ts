@@ -1,6 +1,6 @@
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/db';
 import { computeActiveStatus, getQuizWeight, type StatusColor } from '@/lib/spaced-repetition';
@@ -216,4 +216,73 @@ export async function getRevisionLogs() {
   });
 
   return logs.map(l => l.timestamp);
+}
+
+// Authentication Server Actions
+export async function loginUser(formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  if (!email || !password) throw new Error('Email and password required');
+
+  const { comparePasswords, setSession } = await import('@/lib/auth');
+  const { prisma } = await import('@/lib/db');
+  const user = await prisma.user.findUnique({ where: { email } });
+  
+  if (!user || !(await comparePasswords(password, user.password))) {
+    throw new Error('Invalid credentials');
+  }
+
+  await setSession(user.id);
+}
+
+export async function registerUser(formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  if (!email || !password || password.length < 6) {
+    throw new Error('Valid email and minimum 6 character password required');
+  }
+
+  const { hashPassword, setSession } = await import('@/lib/auth');
+  const { prisma } = await import('@/lib/db');
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) throw new Error('Email already exists');
+
+  const hashedPassword = await hashPassword(password);
+  const user = await prisma.user.create({
+    data: { email, password: hashedPassword }
+  });
+
+  await setSession(user.id);
+}
+
+export async function logoutUser() {
+  const { clearSession } = await import('@/lib/auth');
+  await clearSession();
+}
+
+export async function migrateLegacyData(oldUserId: string) {
+  const { auth } = await import('@/lib/auth');
+  const { userId } = await auth();
+  if (!userId) throw new Error('Unauthorized');
+  
+  if (!oldUserId || oldUserId.trim() === '') {
+    throw new Error('Legacy User ID is required');
+  }
+
+  const { prisma } = await import('@/lib/db');
+  
+  // Update all questions and revision logs
+  const updatedQuestions = await prisma.question.updateMany({
+    where: { userId: oldUserId },
+    data: { userId: userId },
+  });
+
+  const updatedLogs = await prisma.revisionLog.updateMany({
+    where: { userId: oldUserId },
+    data: { userId: userId },
+  });
+
+  return { questions: updatedQuestions.count, logs: updatedLogs.count };
 }

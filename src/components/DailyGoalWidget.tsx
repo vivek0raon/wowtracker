@@ -117,6 +117,39 @@ export default function DailyGoalWidget() {
           {percentage >= 100 ? 'Keep Going 🔥' : 'Start Focus Mode'}
         </Link>
       </div>
+
+      {/* Temporary Migration UI */}
+      <div style={{ marginTop: '2rem', padding: '1rem', border: '1px dashed var(--border-color)', borderRadius: '12px' }}>
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+          <strong>Legacy Data Migration:</strong> Paste your old Clerk User ID from the extension to migrate your questions and logs to this new account.
+        </p>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <input 
+            type="text" 
+            id="legacyUserId"
+            placeholder="user_2..." 
+            style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)' }}
+          />
+          <button 
+            onClick={async () => {
+              const input = document.getElementById('legacyUserId') as HTMLInputElement;
+              if (input && input.value) {
+                try {
+                  const { migrateLegacyData } = await import('@/lib/actions');
+                  const res = await migrateLegacyData(input.value);
+                  alert(`Successfully migrated ${res.questions} questions and ${res.logs} logs!`);
+                  window.location.reload();
+                } catch (e: any) {
+                  alert(e.message || 'Failed to migrate');
+                }
+              }
+            }}
+            style={{ padding: '0.5rem 1rem', background: 'var(--accent)', color: 'white', borderRadius: '6px', fontWeight: 600, border: 'none', cursor: 'pointer' }}
+          >
+            Migrate
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
